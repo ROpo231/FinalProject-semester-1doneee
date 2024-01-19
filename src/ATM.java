@@ -1,10 +1,17 @@
 import java.util.Scanner;
-import java.lang.Thread;
+
+
 public class ATM {
     private Scanner scan;
     private Account saveAccount;
     private Account checkAccount;
     private Customer user;
+
+
+
+
+
+
 
 
 
@@ -17,7 +24,11 @@ public class ATM {
     public void start() {
 
 
+
+
     }
+
+
 
 
     public void welcoming() {
@@ -26,6 +37,8 @@ public class ATM {
         if(makeAccount.equals("y")) {
             creatingAccount();
             enterPin();
+
+
 
 
         }else if(makeAccount.equals("n")) {
@@ -45,6 +58,8 @@ public class ATM {
     }
 
 
+
+
     private void creatingAccount() {
         System.out.println("Ok great but i will need some information first");
         System.out.println("Whats your name? :");
@@ -56,10 +71,12 @@ public class ATM {
             pin = scan.nextLine();
         }
         user = new Customer(pin, name);
-        saveAccount = new Account(user, "SavingsAccount");
-        checkAccount = new Account(user, "CheckingAccount");
+        Account saveAccount = new Account(user, "SavingsAccount");
+        Account checkAccount = new Account(user, "CheckingAccount");
         System.out.println("Your CHECKING and SAVING accounts have successfully been made.");
     }
+
+
 
 
     private void mainMenu() {
@@ -67,6 +84,7 @@ public class ATM {
         String option = scan.nextLine();
         switch (option){
             case "1":
+
 
             case "2":
             case "3":
@@ -81,7 +99,11 @@ public class ATM {
         }
 
 
+
+
     }
+
+
 
 
     private void changePin(){
@@ -96,13 +118,21 @@ public class ATM {
     }
 
 
-    private void withdrawMoney() {
-        System.out.println("Which account do you want to deposit from? 1.Savings or 2.Checking (Pick number)\nOption :");
 
-        System.out.println("How much money do you want? (Must be evenly divisible by 5)\nAmount :");
+
+    private void withdrawMoney() {
+        boolean accountType = accountPicker();
+        System.out.println("How many bills do you want in 5s and 20s? \nAmount in 20s : ");
+        int in20s = scan.nextInt();
+        while(in20s % 1 != 0 ){
+            System.out.println("invalid amount of bills try again");
+        }
+        if(in20s
 
 
     }
+
+
 
 
     private void enterPin() {
@@ -127,14 +157,31 @@ public class ATM {
     }
 
 
-    private Account accountPicker(){
 
 
-
-        return  ;
+    private boolean accountPicker(){
+        System.out.print("Checking or Savings account? (C/S) :");
+        String choice = scan.nextLine().toLowerCase();
+        while(!(choice.equals("s") || choice.equals("c"))){
+            System.out.print("Invalid option try again: ");
+            choice = scan.nextLine().toLowerCase();
+        }
+        if(choice.equals("a")){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
+
+
+
+
+
+
 }
+
+
 
 
