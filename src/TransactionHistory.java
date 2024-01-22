@@ -1,30 +1,38 @@
 public class TransactionHistory {
     private String history;
-    private static int sID;
-    private static int aID;
+    private  int sID;
+    private  int aID;
     public TransactionHistory(){
         this.history = "";
         aID = 0;
         sID = 0;
     }
-    private void addHistoryA(String str){
-        history += "\n" + "ID :A" +numberFormat(aID) + " " +str;
+
+    public void incIDA(){
         aID++;
     }
-    private void addHistoryS(String str){
-        history += "\n" + "ID :S" +numberFormat(sID) + " " +str;
+    public void incIDS(){
         sID++;
     }
-    private String numberFormat(int iD){
-        if(iD < 10){
-            return "000" + iD;
-        }else if(iD < 100){
-            return "00" + iD;
-        }else if(iD < 1000){
-            return "0" + iD;
-        } else{
-            return "" + iD;
-        }
+
+    public String getHistory() {
+        return history;
     }
+
+    public int getAID(){
+        return aID;
+    }
+    public int getSID(){
+        return sID;
+    }
+
+    public void addHistory(String str){
+        history += "\n" + str;
+
+    }
+
+
+
+
 
 }

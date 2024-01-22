@@ -7,9 +7,11 @@ public class ATM {
     private Account checkAccount;
     private Customer user;
     private Account currentAccount;
+    private TransactionHistory entireHistory;
 
     public ATM() {
-        this.scan = new Scanner(System.in);
+        scan = new Scanner(System.in);
+        entireHistory = new TransactionHistory();
     }
     public void start() {
         welcoming();
@@ -58,6 +60,7 @@ public class ATM {
 
 
     private void mainMenu() {
+        boolean over = false;
         System.out.println("Would you like to :\n1. Withdraw money\n2. Deposit money\n3. Transfer money between accounts\n4. Get account balances\n5. Get transaction history\n6. Change PIN\n7. Exit\nOption :");
         String option = scan.nextLine();
         switch (option){
@@ -73,70 +76,105 @@ public class ATM {
                 transfer();
                 break;
             case "4":
-                System.out.println("Savings Account: " + saveAccount.getMoney());
-                System.out.println("Checking Account: " + checkAccount.getMoney());
+                checkBalance();
                 break;
             case "5":
-
+                theTransaction();
+                break;
             case "6":
                 changePin();
+                break;
             case "7":
+                over = true;
+                System.out.println("Thanks for being a customer goodbye");
+                break;
             default:
                 System.out.println("Something went wrong. \nPlease retype option number only");
                 option = scan.nextLine();
         }
+        scan.nextLine();
+        if(!over){
+            System.out.println("Do you want to continue (y/n)");
+            String leave = scan.nextLine().toLowerCase();
+            if (leave.equals("y")) {
+                enterPin();
+                mainMenu();
+            } else {
+                System.out.println("Thanks for being a customer goodbye");
+            }
+        }
+    }
+    private void theTransaction(){
+        System.out.println(entireHistory.getHistory());
+        receipt(2, "Checking transaction history","Successfully checked");
 
-
-
-
+    }
+    private void checkBalance(){
+        System.out.println("Savings Account: " + saveAccount.getMoney());
+        System.out.println("Checking Account: " + checkAccount.getMoney());
+        receipt(2, "Getting account balance" , " Got account balance");
     }
 
 
 
 
 
-    private void transfer(){
+    private void transfer() {
+        String theAcc;
+        String suc = "money transfer was successful";
         System.out.println("First please select the account you want to take money out of to put in the other account.");
         theCurrentAccount();
-        System.out.println("How much would you like to transfer? :");
-        double transferAmount =  scan.nextDouble();
-        while(transferAmount < 0 || (transferAmount * 100) % 1 != 0 || transferAmount <= currentAccount.getMoney()){
-            System.out.println("Amount invalid try again (Make sure you have the amount you are putting!!):");
-            transferAmount = scan.nextDouble();
+         if(currentAccount == saveAccount){
+            theAcc = " From Savings Account to Checking Account";
+        }else{
+            theAcc = " From Checking Account to Savings Account";
         }
-        if(currentAccount == saveAccount){
+        System.out.println("How much would you like to transfer? :");
+        double transferAmount = scan.nextDouble();
+        if (transferAmount < 0 || (transferAmount * 100) % 1 != 0 || transferAmount > currentAccount.getMoney()) {
+            System.out.println("ERROR: Amount invalid");
+            if(transferAmount < 0 || (transferAmount * 100) % 1 != 0){
+                suc = "Amount typed invalid";
+            }else{
+                suc = "you do not have enough money in your account to withdraw that amount FAILED";
+            }
+        }else if(currentAccount == saveAccount){
             saveAccount.withdrawMoney(transferAmount);
             checkAccount.depositMoney(transferAmount);
+
         }else{
             checkAccount.withdrawMoney(transferAmount);
             saveAccount.depositMoney(transferAmount);
         }
+        receipt(1,"transfer $" +transferAmount + theAcc, suc );
 
 
     }
     private void deposit(){
-        if(currentAccount == saveAccount){
-            System.out.println("How much would you like to deposit?(for saving we dont accept coins)");
-            double amount = scan.nextDouble();
-            while(amount < 0 || amount % 1 != 0){
-                System.out.println("Amount invalid try again :");
-                amount = scan.nextDouble();
-            }
-            saveAccount.depositMoney(amount);
-            System.out.println("Done");
-
-
+        String theAcc;
+        if(currentAccount != saveAccount){
+            theAcc = " to Checking Account";
         }else{
-            System.out.println("How much would you like to deposit? (for checking)");
-            double amount = scan.nextDouble();
-            while(amount < 0 || (amount * 100) % 1 != 0   ){
-                System.out.println("Amount invalid try again :");
-                amount = scan.nextDouble();
-            }
-            checkAccount.depositMoney(amount);
-            System.out.println("Done");
-
+            theAcc = " to Savings Account";
         }
+        String suc;
+        System.out.println("How much would you like to deposit?");
+        double amount = scan.nextDouble();
+        if(amount < 0 || (amount * 100) % 1 != 0){
+            System.out.println("Amount invalid ");
+            suc = "Amount inputted invalid FAILED";
+        }else {
+            currentAccount.depositMoney(amount);
+            suc = "Deposited $" + amount +  "into" + theAcc;
+        }
+        if(currentAccount == saveAccount){
+            theAcc = " From Savings Account to Checking Account";
+        }else{
+            theAcc = " From Checking Account to Savings Account";
+        }
+        receipt(1, "Depositing $" +amount + theAcc, suc );
+
+
 
     }
 
@@ -144,48 +182,66 @@ public class ATM {
 
 
     private void changePin(){
-        System.out.println("What do you want your new pin to be? :");
+        String suc = "changed pin";
+        System.out.println("What do you want your new pin to be?(pins are only 4 integers and no spaces please!!!) :");
         String pin = scan.nextLine();
-        while(!checkPinContents(pin)){
-            System.out.println("Something went wrong with your pin! Try again. (pins are only 4 integers and no spaces please!!!) ");
-            pin = scan.nextLine();
+        if(!checkPinContents(pin)){
+            suc = "pin input invalid FAILED";
+            System.out.println("Error pin input invalid ");
+        }else{
+            user.setPin(pin);
+            System.out.println("The new pin has been successfully set");
         }
         user.setPin(pin);
         System.out.println("The new pin has been successfully set");
+        receipt(2, "changing PIN",suc  );
     }
 
 
 
 
     private void withdrawMoney() {
-        String thError = "";
-        if(currentAccount.getMoney() >= 5) {
-            System.out.println("You can only withdraw in bills of 5s and 20s\nHow much would you like to withdraw?(Integer amount only & No spaces please!!) :");
-            double totalAmount = scan.nextDouble();
-            if (totalAmount < 5 || totalAmount % 5 != 0) {
-                System.out.println("ERROR:Invalid amount\nGoodbye!");
-
-            }else if (totalAmount > currentAccount.getMoney()) {
-                System.out.println("ERROR:insufficient funds!\nGoodbye!");
-            } else {
-                System.out.println("How many  20 bills :");
-                int twenty = scan.nextInt();
-                while (twenty * 20 > totalAmount) {
-                    System.out.println("Invalid amount (Might be too many bills)\nTry again :");
-                    twenty = scan.nextInt();
-                }
-                System.out.println("How many  5 bills :");
-                int fives = scan.nextInt();
-                while (fives * 5 > totalAmount - (twenty * 20) || fives * 5 < totalAmount - (twenty * 20)) {
-                    System.out.println("Invalid amount (Might be too many/little bills)\nTry again :");
-                    fives = scan.nextInt();
-                }
-                currentAccount.withdrawMoney((twenty * 20) + (fives * 5));
-                System.out.println("Ok done!!");
-            }
+        double totalAmount;
+        String theAcc;
+        String suc;
+        if(currentAccount != saveAccount){
+            theAcc = " Withdrawing from Checking Account $";
+            suc = "Withdrew from Checking Account  $";
         }else{
-            System.out.println("ERROR: insufficient funds!\nGoodbye!");
+            theAcc = " Withdrawing from to Savings Account $";
+            suc = "Withdrew from Savings Account $";
         }
+
+        System.out.println("You can only withdraw in bills of 5s and 20s\nHow much would you like to withdraw?(Integer amount only & No spaces please!!) :");
+        totalAmount = scan.nextDouble();
+        if (totalAmount < 5 || totalAmount % 5 != 0) {
+            System.out.println("ERROR:Invalid amount\nGoodbye!");
+            suc = "Invalid amount of money for withdraw FAILED";
+
+        }else if (totalAmount > currentAccount.getMoney()) {
+            System.out.println("ERROR:insufficient funds!\nGoodbye!");
+            suc = "dont have enough money in account for withdraw FAILED";
+        } else {
+            System.out.println("How many  20 bills :");
+            int twenty = scan.nextInt();
+            while (twenty * 20 > totalAmount) {
+                System.out.println("Invalid amount (Might be too many bills)\nTry again :");
+                twenty = scan.nextInt();
+            }
+            System.out.println("How many  5 bills :");
+            int fives = scan.nextInt();
+            while (fives * 5 > totalAmount - (twenty * 20) || fives * 5 < totalAmount - (twenty * 20)) {
+                System.out.println("Invalid amount (Might be too many/little bills)\nTry again :");
+                fives = scan.nextInt();
+            }
+            currentAccount.withdrawMoney((twenty * 20) + (fives * 5));
+            System.out.println("Ok done!!");
+
+
+        }
+        receipt(1, theAcc + totalAmount, suc );
+
+
 
 
 
@@ -208,7 +264,7 @@ public class ATM {
 
 
     private void enterPin() {
-        System.out.println("Please enter a pin to access you account.(No spaces please)");
+        System.out.println("Please enter a pin to access your account.(No spaces please)");
         String pin = scan.nextLine();
         while(!user.getPin().equals(pin)){
             System.out.println("Somethings worng. Try again.(No spaces please)");
@@ -226,6 +282,31 @@ public class ATM {
             return false;
         }
         return true;
+    }
+    private String numberFormat(int iD){
+        if(iD < 10){
+            return "000" + iD;
+        }else if(iD < 100){
+            return "00" + iD;
+        }else if(iD < 1000){
+            return "0" + iD;
+        } else{
+            return "" + iD;
+        }
+    }
+
+    private void receipt(int iDNum, String summery, String suc ){
+        String iD;
+        if(iDNum == 1){
+            iD = " A" + numberFormat(entireHistory.getAID());
+            entireHistory.incIDA();
+        }else{
+            iD = " S" + numberFormat(entireHistory.getSID());
+            entireHistory.incIDS();
+        }
+        String str = summery + " ID:"+iD + "  " + suc + " Saving -$" + saveAccount.getMoney() + " Checking -$" + checkAccount.getMoney();
+        entireHistory.addHistory(str);
+        System.out.println("RECEIPT:\n" + str);
     }
 
 
