@@ -1,10 +1,12 @@
 public class Account {
     private double money;
     private Customer user;
+    private String accountType;
 
-    public Account (Customer user){
+    public Account (Customer user, String accountType){
         this.money = 0;
         this.user = user;
+        this.accountType = accountType;
     }
     public double getMoney(){
         return this.money;
