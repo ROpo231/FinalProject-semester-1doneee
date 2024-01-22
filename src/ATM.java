@@ -21,7 +21,7 @@ public class ATM {
     }
 
 
-
+    //this welcomes the user and starts the program
     private void welcoming() {
         System.out.println("Welcome to your friendly local ATM!!!\n You dont have a account yet would you like to create one? (y/n) : ");
         String makeAccount = scan.nextLine();
@@ -39,7 +39,7 @@ public class ATM {
 
 
 
-
+    //creates the accounts and gets password and make
     private void creatingAccount() {
         System.out.println("Ok great but i will need some information first");
         System.out.println("Whats your name? :");
@@ -58,7 +58,7 @@ public class ATM {
 
 
 
-
+    //main menu all the options are there the case which matches up with the input (option) will activate and if non the default will activate
     private void mainMenu() {
         boolean over = false;
         System.out.println("Would you like to :\n1. Withdraw money\n2. Deposit money\n3. Transfer money between accounts\n4. Get account balances\n5. Get transaction history\n6. Change PIN\n7. Exit\nOption :");
@@ -104,6 +104,7 @@ public class ATM {
             }
         }
     }
+
     private void theTransaction(){
         System.out.println(entireHistory.getHistory());
         receipt(2, "Checking transaction history","Successfully checked");
@@ -118,7 +119,7 @@ public class ATM {
 
 
 
-
+    //tranfer the money. when the user picks the fron account it goes to the other account as the to
     private void transfer() {
         String theAcc;
         String suc = "money transfer was successful";
@@ -150,6 +151,8 @@ public class ATM {
 
 
     }
+
+    //deposits the money
     private void deposit(){
         String theAcc;
         if(currentAccount != saveAccount){
@@ -180,7 +183,7 @@ public class ATM {
 
 
 
-
+    //changes the pin
     private void changePin(){
         String suc = "changed pin";
         System.out.println("What do you want your new pin to be?(pins are only 4 integers and no spaces please!!!) :");
@@ -199,7 +202,7 @@ public class ATM {
 
 
 
-
+    // take out money for withdraw it makes sure that the input is good too
     private void withdrawMoney() {
         double totalAmount;
         String theAcc;
@@ -214,7 +217,7 @@ public class ATM {
 
         System.out.println("You can only withdraw in bills of 5s and 20s\nHow much would you like to withdraw?(Integer amount only & No spaces please!!) :");
         totalAmount = scan.nextDouble();
-        if (totalAmount < 5 || totalAmount % 5 != 0) {
+        if (totalAmount < 5 || totalAmount % 5 != 0) {  //checking if input ok multiple of 5
             System.out.println("ERROR:Invalid amount\nGoodbye!");
             suc = "Invalid amount of money for withdraw FAILED";
 
@@ -230,7 +233,7 @@ public class ATM {
             }
             System.out.println("How many  5 bills :");
             int fives = scan.nextInt();
-            while (fives * 5 > totalAmount - (twenty * 20) || fives * 5 < totalAmount - (twenty * 20)) {
+            while (fives * 5 > totalAmount - (twenty * 20) || fives * 5 < totalAmount - (twenty * 20)) { //checks if to many bills or less bills to get the totalamount
                 System.out.println("Invalid amount (Might be too many/little bills)\nTry again :");
                 fives = scan.nextInt();
             }
@@ -246,6 +249,8 @@ public class ATM {
 
 
     }
+
+    //helps get account the user want action to be on
     private void theCurrentAccount(){
         System.out.println("Which account? Savings or Checking (S/C) :");
         String option = scan.nextLine().toLowerCase();
@@ -272,6 +277,8 @@ public class ATM {
         }
         System.out.println("Access granted.");
     }
+
+    //make sure the pin contents ok so it can be set as a pin. if contents not just numbers the pin is bad return false
     private boolean checkPinContents(String thePin) {
         if(thePin.length() != 4) {
             return false;
@@ -283,6 +290,8 @@ public class ATM {
         }
         return true;
     }
+
+    //formats the numbers properly so they can be used for id
     private String numberFormat(int iD){
         if(iD < 10){
             return "000" + iD;
@@ -294,6 +303,8 @@ public class ATM {
             return "" + iD;
         }
     }
+
+    //this is receipt and add the receipt to the history of transactions  suc is the succes status
 
     private void receipt(int iDNum, String summery, String suc ){
         String iD;
